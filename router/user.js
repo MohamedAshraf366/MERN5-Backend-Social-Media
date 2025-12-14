@@ -32,7 +32,7 @@ router.post('/signup', async(req, resp)=>{
                 maxAge:7*24*60*60*1000,//node handle with millescond
                 httpOnly:true, // to prevent attack and more secure
                 sameSite:'lax', // to prevent attack and more secure
-                secure:false,
+                secure:process.env.NODE_ENV === 'production',
             });
         resp.status(200).json({status:'success', data:{user, token}})
     }
@@ -60,7 +60,7 @@ router.post('/signin', async(req, resp)=>{
             maxAge:7*24*60*60*1000,//node handle with millescond
             httpOnly:true, // to prevent attack and more secure
             sameSite:'lax', // to prevent attack and more secure
-            secure:false,
+            secure:process.env.NODE_ENV === 'production',
         })
         resp.status(200).json({status:'success', data:{user, token}})
     }
@@ -69,28 +69,13 @@ router.post('/signin', async(req, resp)=>{
     }
 })
 
-router.get('/me', async (req, resp) => {
-  try {
-    const token = req.cookies.jwtCookies;
-    if (!token) return resp.status(401).json({ status: 'fail', data: 'Not authenticated' });
-
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const user = await User.findById(decoded.id);
-    if (!user) return resp.status(401).json({ status: 'fail', data: 'User not found' });
-
-    resp.status(200).json({ status: 'success', data: { user } });
-  } catch (error) {
-    resp.status(500).json({ status: 'error', data: error.message });
-  }
-});
-
 router.delete('/logout', async(req, resp)=>{
     try{
         resp.cookie('jwtCookies','',{
             maxAge:0,
             httpOnly:true, // to prevent attack and more secure
             sameSite:'lax', // to prevent attack and more secure
-            secure:false,
+            secure:process.env.NODE_ENV === 'production',
         })
         resp.status(200).json({status:'success', data:"Cookie removed succefully"})
     }
