@@ -5,6 +5,7 @@ let router = express.Router()
 let bcryptjs = require('bcryptjs')
 let jwt = require('jsonwebtoken')
 let cloudinary = require('../config/cloudinary');
+const auth = require('./auth/middleware')
 router.post('/signup', async(req, resp)=>{
     try{
         let{userName, email, password, image} = req.body
@@ -31,8 +32,8 @@ router.post('/signup', async(req, resp)=>{
         resp.cookie('jwtCookies', token, {
                 maxAge:7*24*60*60*1000,//node handle with millescond
                 httpOnly:true, // to prevent attack and more secure
-                sameSite:'lax', // to prevent attack and more secure
-                secure:process.env.NODE_ENV === 'production',
+                sameSite:'none', // to prevent attack and more secure
+                secure:true,
             });
         resp.status(200).json({status:'success', data:{user, token}})
     }
@@ -59,8 +60,8 @@ router.post('/signin', async(req, resp)=>{
         resp.cookie('jwtCookies', token,{
             maxAge:7*24*60*60*1000,//node handle with millescond
             httpOnly:true, // to prevent attack and more secure
-            sameSite:'lax', // to prevent attack and more secure
-            secure:process.env.NODE_ENV === 'production',
+            sameSite:'none', // to prevent attack and more secure
+            secure:true,
         })
         resp.status(200).json({status:'success', data:{user, token}})
     }
@@ -69,13 +70,26 @@ router.post('/signin', async(req, resp)=>{
     }
 })
 
+router.get('/me', auth, async (req, resp) => {
+  try {
+    resp.status(200).json({
+      status: 'success',
+      data: {
+        user: req.user
+      }
+    })
+  } catch (error) {
+    resp.status(500).json({ status: 'error', data: error })
+  }
+})
+
 router.delete('/logout', async(req, resp)=>{
     try{
         resp.cookie('jwtCookies','',{
             maxAge:0,
             httpOnly:true, // to prevent attack and more secure
-            sameSite:'lax', // to prevent attack and more secure
-            secure:process.env.NODE_ENV === 'production',
+            sameSite:'none', // to prevent attack and more secure
+            secure:true,
         })
         resp.status(200).json({status:'success', data:"Cookie removed succefully"})
     }

@@ -27,6 +27,15 @@ router.get('/allPosts',async(req,resp)=>{
     }
     resp.status(200).json({status:'success', data:post})  
 })
+//to get post for specifc usser
+router.get('/userProfile', auth,async(req, resp)=>{
+    const userId = req.user._id
+    const post = await Post.find({userId}).populate('userId').populate('comment.userId')
+    if(!post.length){
+        return resp.status(400).json({status:'fail', data:'No post'})
+    }
+    resp.status(200).json({status:'success', data:post})  
+})
 //to write comment
 router.patch('/writeComment/:postId', auth,async(req, resp)=>{
     const{postId} = req.params
@@ -52,15 +61,6 @@ router.patch('/writeComment/:postId', auth,async(req, resp)=>{
     resp.status(200).json({status:'success', data:{populatedPost}})   
 })
 
-//to get post for specifc usser
-router.get('/userProfile', auth,async(req, resp)=>{
-    const userId = req.user._id
-    const post = await Post.find({userId}).populate('userId').populate('comment.userId')
-    if(!post.length){
-        return resp.status(400).json({status:'fail', data:'No post'})
-    }
-    resp.status(200).json({status:'success', data:post})  
-})
 //to get one posts
 router.get('/post/:id', auth,async(req, resp)=>{
     const{id} = req.params
