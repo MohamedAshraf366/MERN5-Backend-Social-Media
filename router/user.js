@@ -69,7 +69,7 @@ router.post('/signin', async(req, resp)=>{
         resp.status(500).json({status:'error', data:error})
     }
 })
-
+//to make sure user
 router.get('/me', auth, async (req, resp) => {
   try {
     resp.status(200).json({

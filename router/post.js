@@ -27,7 +27,7 @@ router.get('/allPosts',async(req,resp)=>{
     }
     resp.status(200).json({status:'success', data:post})  
 })
-//to get post for specifc usser
+//to get post for specifc user
 router.get('/userProfile', auth,async(req, resp)=>{
     const userId = req.user._id
     const post = await Post.find({userId}).populate('userId').populate('comment.userId')
